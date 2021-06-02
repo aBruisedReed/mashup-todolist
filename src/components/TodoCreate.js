@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
 import { MdAdd } from 'react-icons/md';
 import { lighten, darken } from 'polished';
+import { ContextData } from '../App';
 
 const CircleButton = styled.button`
   background: ${props => props.theme.palette.cyan};
@@ -75,12 +76,26 @@ const Input = styled.input`
 
 function TodoCreate() {
   const [open, setOpen] = useState(false);
+  const [input, setInput] = useState('');
+  const [state, dispatch] = useContext(ContextData);
+
+  const handleChange = e => {
+    setInput(e.target.value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    dispatch({ type: 'ADD', text: input });
+    setInput('');
+    setOpen(false);
+  };
+  
   return (
   <>
     {open && (
       <InsertFormContainer>
-        <InsertForm>
-          <Input autoFocus placeholder="Enter a to-do and press Enter"></Input>
+        <InsertForm onSubmit={handleSubmit}>
+          <Input value={input} onChange={handleChange} autoFocus placeholder="Enter a to-do and press Enter"></Input>
         </InsertForm>
       </InsertFormContainer>
     )}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useReducer } from 'react';
 import { createGlobalStyle, ThemeProvider } from 'styled-components';
 import TodoTemplate from './components/TodoTemplate';
 import TodoHead from './components/TodoHead';
@@ -12,13 +12,6 @@ const theme = {
     gray: '#868e96',
     cyan: '#20c997',
     pink: '#ff6b6b',
-    1: '#ced4da',
-    2: '#38d9a9',
-    3: '#495057',
-    4: '#63e6be',
-    5: '#20c997',
-    6: '#f8f9fa',
-    7: '#dee2e6'
   } 
 }
 
@@ -28,16 +21,62 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
+function reducer(state, action) {
+  switch(action.type) {
+    case 'ADD':
+      return { ...state, lastId: state.lastId+1, itemList: [...state.itemList, { id: state.lastId+1, done: false, text: action.text }] };
+    case 'DONE':
+      return { ...state, itemList: state.itemList.map(item => 
+        item.id === action.selectedId ? {...item, done: !item.done} : item)
+      };
+    case 'REMOVE':
+      return { ...state, itemList: state.itemList.filter(item => 
+        item.id !== action.selectedId)
+      };
+    default: 
+      return state;
+  }
+}
+
+const defaultState = {
+  lastId: 2,
+  itemList: [
+    {
+      id: 0,
+      done: true,
+      text: 'cleaning room',
+    },
+    {
+      id: 1,
+      done: true,
+      text: 'feeding cat',
+    },
+    {
+      id: 2,
+      done: false,
+      text: 'work out',
+    }
+  ]
+}
+
+export const ContextData = React.createContext(null);
+
 function App() {
+  const [state, dispatch] = useReducer(reducer, defaultState);
+  // const test = () => {
+  //   dispatch()
+  // };
   return (
     <>
       <ThemeProvider theme={theme} >
-        <GlobalStyle />
-        <TodoTemplate>
-          <TodoHead></TodoHead>
-          <TodoList></TodoList>
-          <TodoCreate></TodoCreate>
-        </TodoTemplate>
+        <ContextData.Provider value={[state, dispatch]}>
+          <GlobalStyle />
+            <TodoTemplate>
+              <TodoHead></TodoHead>
+                <TodoList></TodoList>
+                  <TodoCreate></TodoCreate>
+          </TodoTemplate>
+        </ContextData.Provider>
       </ThemeProvider>
     </>
   );

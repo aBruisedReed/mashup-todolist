@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
+import { ContextData } from '../App';
 
 const TodoHeadBlock = styled.div`
   padding: 28px 32px 24px 32px;
@@ -25,11 +26,23 @@ const TodoHeadBlock = styled.div`
 `;
 
 function TodoHead() {
+  const [state] = useContext(ContextData);
+
+  const date = new Date().toLocaleDateString("ko-KR", {timeZone: "Asia/Seoul"});
+
+  const day = new Date().toLocaleString("ko-KR", { weekday: 'long'});
+
+  const countLeftTasks = () => {
+    const leftList = state.itemList.filter(item => item.done === false);
+    console.log(leftList);
+    return leftList.length;
+  };
+
   return (
     <TodoHeadBlock>
-      <div className="date">2021년 5월 30일</div>
-      <div className="day">수요일</div>
-      <div className="left-tasks">할 일 1개 남음</div>
+      <div className="date">{date}</div>
+      <div className="day">{day}</div>
+      <div className="left-tasks">할 일 {countLeftTasks()}개 남음</div>
     </TodoHeadBlock>
   );
 }
